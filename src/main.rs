@@ -44,7 +44,9 @@ async fn example() -> Result<(), Box<dyn Error>> {
     let mut rdr = csv::Reader::from_path("/home/pmaku/projects/provider-test-data.csv")?;
     for result in rdr.deserialize(){
         let record: NYProviderFeed = result?;
-        let mut query = Query::new("INSERT INTO dbo.ProvMaster (ProvMasterKey) VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
+        let id_insert = client.execute("SET  IDENTITY_INSERT provider.dbo.ProvMaster ON",&[] ).await;
+        print!("{:#?}",id_insert);
+        let mut query = Query::new("INSERT INTO provider.dbo.ProvMaster (ProvMasterKey) VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
         query.bind(record.medicaid_provider_id);
         query.bind(record.npi);
         query.bind(record.provider_or_facility_name);

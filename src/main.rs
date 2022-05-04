@@ -2,13 +2,15 @@ mod provider_model;
 use provider_model::NYProviderFeed;
 use std::error::Error;
 use std::process;
-use tiberius::{AuthMethod, Client, Config, Query};
+use tiberius::{AuthMethod, Client, Config};
 use tokio::net::TcpStream;
 use tokio_util::compat::TokioAsyncWriteCompatExt;
-use tracing::{error, info};
+use tracing::{error, info, log::trace};
 use tracing_subscriber;
 
-static INPUT_FILE: &str = "/Users/patrickmaku/Projects/tiberius-test/provider-test-data.csv";
+// static INPUT_FILE: &str = "/Users/patrickmaku/Projects/tiberius-test/provider-test-data.csv";
+static INPUT_FILE: &str = "./provider-test-data.csv";
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -16,7 +18,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::INFO)
         .init();
-    info!("Application starting ...");
+    info!("application start");
 
     if let Err(err) = example().await {
         error!("error running example: {}", err);
@@ -26,7 +28,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 async fn example() -> Result<(), Box<dyn Error>> {
-    info!("Configure database connection ...");
+    trace!("setup database connection ...");
 
     let mut config = Config::new();
 
@@ -47,65 +49,35 @@ async fn example() -> Result<(), Box<dyn Error>> {
     let mut client = Client::connect(config, tcp.compat_write()).await?;
     let mut rdr = csv::Reader::from_path(INPUT_FILE)?;
 
-    info!("Start loading database ...");
-
+    info!("load database ...");
     for result in rdr.deserialize() {
         let record: NYProviderFeed = result?;
-        // let mut query = Query::new("INSERT INTO provider.dbo.ProvMaster  VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
+        let payload = format!("INSERT into dbo.ProvMaster VALUES ({},{},'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}',{},{},'{}','{}','{}','{}','{}')",
+                &record.medicaid_provider_id.unwrap_or(0), 
+                &record.npi.unwrap_or(0),
+                &record.provider_or_facility_name.unwrap_or("".to_string()),
+                &record.medicaid_type.unwrap_or("".to_string()),
+                &record.profession_or_service.unwrap_or("".to_string()),
+                &record.provider_specialty.unwrap_or("".to_string()),
+                &record.service_address.unwrap_or("".to_string()),
+                &record.city.unwrap_or("".to_string()),
+                &record.state.unwrap_or("".to_string()),
+                &record.zip_code.unwrap_or("".to_string()),
+                &record.county.unwrap_or("".to_string()),
+                &record.telephone.unwrap_or("".to_string()),
+                &record.latitude.unwrap_or(0.0),
+                &record.longitude.unwrap_or(0.0),
+                &record.enrollment_begin_date.unwrap(),
+                &record.next_anticipated_revalidation_date.unwrap(),
+                &record.file_date.unwrap(),
+                &record.medically_fragile_children_directory_ind.unwrap_or("".to_string()),
+                &record.provider_email.unwrap_or("".to_string()),
+            );
+        let _result = client.simple_query(payload).await?;
 
-        // query.bind(record.medicaid_provider_id);
-        // query.bind(record.npi);
-        // query.bind(record.provider_or_facility_name);
-        // query.bind(record.medicaid_type);
-        // query.bind(record.profession_or_service);
-        // query.bind(record.provider_specialty);
-        // query.bind(record.service_address);
-        // query.bind(record.city);
-        // query.bind(record.state);
-        // query.bind(record.zip_code);
-        // query.bind(record.county);
-        // query.bind(record.telephone);
-        // query.bind(record.latitude);
-        // query.bind(record.longitude);
-        // query.bind(record.enrollment_begin_date);
-        // query.bind(record.next_anticipated_revalidation_date);
-        // query.bind(record.file_date);
-        // query.bind(record.medically_fragile_children_directory_ind);
-        // query.bind(record.provider_email);
-        // let _results = query.execute(&mut client).await;
-
-        // println!("{:#?}", _results);
-
-        // =======================================
-        let results = client
-            .execute(
-                "INSERT INTO provider.dbo.ProvMaster  VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)",
-                &[
-                    &record.medicaid_provider_id, 
-                    &record.npi,
-                    &record.provider_or_facility_name,
-                    &record.medicaid_type,
-                    &record.profession_or_service,
-                    &record.provider_specialty,
-                    &record.service_address,
-                    &record.city,
-                    &record.state,
-                    &record.zip_code,
-                    &record.county,
-                    &record.telephone,
-                    &record.latitude,
-                    &record.longitude,
-                    &record.enrollment_begin_date,
-                    &record.next_anticipated_revalidation_date,
-                    &record.file_date,
-                    &record.medically_fragile_children_directory_ind,
-                    &record.provider_email,
-                ],
-            )
-            .await?;
-
-        // =======================================
     }
+    info!("database load complete ...");
 
     Ok(())
 }
+

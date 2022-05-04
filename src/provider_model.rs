@@ -1,12 +1,12 @@
-use serde::{Deserialize,Serialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize,Serialize)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct NYProviderFeed {
     #[serde(rename(deserialize = "MEDICAID PROVIDER ID"))]
-    pub medicaid_provider_id: Option<i32>,
+    pub medicaid_provider_id: Option<i64>,
 
     #[serde(rename(deserialize = "NPI"))]
-    pub npi: Option<i32>,
+    pub npi: Option<i64>,
 
     #[serde(rename(deserialize = "PROVIDER OR FACILITY NAME"))]
     pub provider_or_facility_name: Option<String>,
@@ -57,4 +57,3 @@ pub struct NYProviderFeed {
     #[serde(rename(deserialize = "PROVIDEREMAIL"))]
     pub provider_email: Option<String>,
 }
-

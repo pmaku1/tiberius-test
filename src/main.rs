@@ -51,31 +51,61 @@ async fn example() -> Result<(), Box<dyn Error>> {
 
     for result in rdr.deserialize() {
         let record: NYProviderFeed = result?;
-        // let mut query = Query::new("INSERT INTO provider.dbo.ProvMaster (ProvMasterKey) VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
-        let mut query = Query::new("INSERT INTO provider.dbo.ProvMaster  VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
+        // let mut query = Query::new("INSERT INTO provider.dbo.ProvMaster  VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
 
-        query.bind(record.medicaid_provider_id);
-        query.bind(record.npi);
-        query.bind(record.provider_or_facility_name);
-        query.bind(record.medicaid_type);
-        query.bind(record.profession_or_service);
-        query.bind(record.provider_specialty);
-        query.bind(record.service_address);
-        query.bind(record.city);
-        query.bind(record.state);
-        query.bind(record.zip_code);
-        query.bind(record.county);
-        query.bind(record.telephone);
-        query.bind(record.latitude);
-        query.bind(record.longitude);
-        query.bind(record.enrollment_begin_date);
-        query.bind(record.next_anticipated_revalidation_date);
-        query.bind(record.file_date);
-        query.bind(record.medically_fragile_children_directory_ind);
-        query.bind(record.provider_email);
-        let _results = query.execute(&mut client).await;
+        // query.bind(record.medicaid_provider_id);
+        // query.bind(record.npi);
+        // query.bind(record.provider_or_facility_name);
+        // query.bind(record.medicaid_type);
+        // query.bind(record.profession_or_service);
+        // query.bind(record.provider_specialty);
+        // query.bind(record.service_address);
+        // query.bind(record.city);
+        // query.bind(record.state);
+        // query.bind(record.zip_code);
+        // query.bind(record.county);
+        // query.bind(record.telephone);
+        // query.bind(record.latitude);
+        // query.bind(record.longitude);
+        // query.bind(record.enrollment_begin_date);
+        // query.bind(record.next_anticipated_revalidation_date);
+        // query.bind(record.file_date);
+        // query.bind(record.medically_fragile_children_directory_ind);
+        // query.bind(record.provider_email);
+        // let _results = query.execute(&mut client).await;
 
-        println!("{:#?}", _results);
+        // println!("{:#?}", _results);
+
+        // =======================================
+        let results = client
+            .execute(
+                "INSERT INTO provider.dbo.ProvMaster  VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)",
+                &[
+                    &record.medicaid_provider_id, 
+                    &record.npi,
+                    &record.provider_or_facility_name,
+                    &record.medicaid_type,
+                    &record.profession_or_service,
+                    &record.provider_specialty,
+                    &record.service_address,
+                    &record.city,
+                    &record.state,
+                    &record.zip_code,
+                    &record.county,
+                    &record.telephone,
+                    &record.latitude,
+                    &record.longitude,
+                    &record.enrollment_begin_date,
+                    &record.next_anticipated_revalidation_date,
+                    &record.file_date,
+                    &record.medically_fragile_children_directory_ind,
+                    &record.provider_email,
+                ],
+            )
+            .await?;
+
+        // =======================================
     }
+
     Ok(())
 }

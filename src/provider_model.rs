@@ -3,10 +3,10 @@ use serde::{Deserialize,Serialize};
 #[derive(Default, Debug, Clone, PartialEq, Deserialize,Serialize)]
 pub struct NYProviderFeed {
     #[serde(rename(deserialize = "MEDICAID PROVIDER ID"))]
-    pub medicaid_provider_id: Option<String>,
+    pub medicaid_provider_id: Option<i32>,
 
     #[serde(rename(deserialize = "NPI"))]
-    pub npi: Option<String>,
+    pub npi: Option<i32>,
 
     #[serde(rename(deserialize = "PROVIDER OR FACILITY NAME"))]
     pub provider_or_facility_name: Option<String>,
@@ -37,10 +37,10 @@ pub struct NYProviderFeed {
     #[serde(rename(deserialize = "TELEPHONE"))]
     pub telephone: Option<String>,
     #[serde(rename(deserialize = "LATITUDE"))]
-    pub latitude: Option<String>,
+    pub latitude: Option<f64>,
 
     #[serde(rename(deserialize = "LONGITUDE"))]
-    pub longitude: Option<String>,
+    pub longitude: Option<f64>,
 
     #[serde(rename(deserialize = "ENROLLMENT BEGIN DATE"))]
     pub enrollment_begin_date: Option<String>,

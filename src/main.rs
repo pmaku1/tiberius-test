@@ -32,15 +32,17 @@ async fn example() -> Result<(), Box<dyn Error>> {
 
     config.host("localhost");
     config.port(1433);
+    config.database("provider");
     config.authentication(AuthMethod::sql_server("sa", "Password_01"));
+
+    if cfg!(target_os = "macos") {
+        // Hack to get past TLS connection issue on macOS v12.3.1
+        config.encryption(tiberius::EncryptionLevel::NotSupported);
+    }
     config.trust_cert(); // on production, it is not a good idea to do this
 
     let tcp = TcpStream::connect(config.get_addr()).await?;
     tcp.set_nodelay(true)?;
-
-    // To be able to use Tokio's tcp, we're using the `compat_write` from
-    // the `TokioAsyncWriteCompatExt` to get a stream compatible with the
-    // traits from the `futures` crate.
 
     let mut client = Client::connect(config, tcp.compat_write()).await?;
     let mut rdr = csv::Reader::from_path(INPUT_FILE)?;
@@ -49,8 +51,6 @@ async fn example() -> Result<(), Box<dyn Error>> {
 
     for result in rdr.deserialize() {
         let record: NYProviderFeed = result?;
-        // let id_insert = client.execute("SET  IDENTITY_INSERT provider.dbo.ProvMaster ON",&[] ).await;
-
         // let mut query = Query::new("INSERT INTO provider.dbo.ProvMaster (ProvMasterKey) VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
         let mut query = Query::new("INSERT INTO provider.dbo.ProvMaster  VALUES (@P1), (@P2), (@P3),(@p4), (@P5), (@P6),(@P7),(@P8), (@P9), (@P10), (@P11), (@P12), (@P13), (@P14),(@P15),(@P16),(@P18),(@P19)");
 

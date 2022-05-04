@@ -73,7 +73,7 @@ async fn example() -> Result<(), Box<dyn Error>> {
                 &record.medically_fragile_children_directory_ind.unwrap_or("".to_string()),
                 &record.provider_email.unwrap_or("".to_string()),
             );
-        let _result = client.simple_query(payload).await?;
+        let _result = client.simple_query(payload).await;
 
     }
     info!("database load complete ...");
